@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalkulator Marży Zabiegu · R.O.S.™ Sara Wierzbicka</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bordeaux: #5C1A2E;
+    --bordeaux-dark: #3D1020;
+    --bordeaux-light: #8a3050;
+    --gold: #C9A96E;
+    --ivory: #F2EAD9;
+    --black: #1A1410;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #F5F0E8;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 4rem;
+    color: var(--black);
+  }
+
+  .wrap {
+    width: 100%;
+    max-width: 620px;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--bordeaux);
+    border-radius: var(--radius);
+    padding: 2rem 2rem 1.75rem;
+    margin-bottom: 1.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(201,169,110,0.08);
+  }
+  .header-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .gold-line {
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.45;
+    margin: 10px 0 14px;
+  }
+  .header-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 34px;
+    font-weight: 600;
+    color: var(--ivory);
+    line-height: 1.15;
+    margin-bottom: 8px;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: var(--ivory);
+    opacity: 0.6;
+    font-weight: 300;
+    line-height: 1.5;
+  }
+
+  /* SECTIONS */
+  .section {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid rgba(92,26,46,0.08);
+  }
+
+  .section-label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: rgba(92,26,46,0.12);
+  }
+
+  /* FIELDS */
+  .field {
+    margin-bottom: 1.1rem;
+  }
+  .field:last-child { margin-bottom: 0; }
+
+  .field-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .field-info { flex: 1; }
+
+  .field-info label {
+    font-size: 14px;
+    color: #2a1018;
+    font-weight: 400;
+    line-height: 1.4;
+    display: block;
+  }
+
+  .field-note {
+    font-size: 11px;
+    color: #888;
+    margin-top: 2px;
+    font-weight: 300;
+  }
+
+  .field input[type="number"] {
+    width: 100px;
+    text-align: right;
+    font-size: 15px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    padding: 8px 10px;
+    border: 1px solid rgba(92,26,46,0.2);
+    border-radius: var(--radius-sm);
+    background: #faf7f2;
+    color: var(--bordeaux-dark);
+    outline: none;
+    transition: border-color 0.2s;
+    -moz-appearance: textfield;
+  }
+  .field input[type="number"]::-webkit-inner-spin-button,
+  .field input[type="number"]::-webkit-outer-spin-button { opacity: 1; }
+  .field input[type="number"]:focus {
+    border-color: var(--bordeaux);
+    background: #fff;
+  }
+
+  .unit {
+    font-size: 13px;
+    color: #999;
+    min-width: 18px;
+    font-weight: 300;
+  }
+
+  /* HELPER */
+  .helper {
+    background: #faf7f2;
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    margin-top: 1rem;
+    border-left: 3px solid var(--gold);
+    display: none;
+  }
+  .helper.visible { display: block; }
+  .helper-title {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .helper-text {
+    font-size: 12px;
+    color: #666;
+    line-height: 1.5;
+  }
+
+  /* RESULT */
+  .result-box {
+    border-radius: var(--radius);
+    padding: 1.75rem 1.5rem 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+  }
+  .result-unknown {
+    background: #fff;
+    border: 1px solid rgba(92,26,46,0.1);
+  }
+  .result-negative {
+    background: #fff0f0;
+    border: 1px solid #f09595;
+  }
+  .result-low {
+    background: #fffbf0;
+    border: 1px solid #f5c175;
+  }
+  .result-ok {
+    background: #f4faf0;
+    border: 1px solid #a8d48a;
+  }
+  .result-great {
+    background: #f0faf6;
+    border: 1px solid #7dcfb0;
+  }
+
+  .result-eyebrow {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: #999;
+  }
+  .result-negative .result-eyebrow { color: #c0392b; }
+  .result-low .result-eyebrow { color: #d48010; }
+  .result-ok .result-eyebrow { color: #3a7d1e; }
+  .result-great .result-eyebrow { color: #0f6e56; }
+
+  .result-number {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 54px;
+    font-weight: 600;
+    line-height: 1;
+    margin-bottom: 4px;
+    color: #ccc;
+    transition: color 0.3s;
+  }
+  .result-negative .result-number { color: #c0392b; }
+  .result-low .result-number { color: #d48010; }
+  .result-ok .result-number { color: #3a7d1e; }
+  .result-great .result-number { color: #0f6e56; }
+
+  .result-percent {
+    font-size: 14px;
+    color: #999;
+    margin-bottom: 12px;
+    font-weight: 300;
+  }
+  .result-negative .result-percent { color: #c0392b; }
+  .result-low .result-percent { color: #d48010; }
+  .result-ok .result-percent { color: #3a7d1e; }
+  .result-great .result-percent { color: #0f6e56; }
+
+  .result-msg {
+    font-size: 13px;
+    line-height: 1.6;
+    color: #aaa;
+    font-weight: 300;
+  }
+  .result-negative .result-msg { color: #7a2020; }
+  .result-low .result-msg { color: #7a4a10; }
+  .result-ok .result-msg { color: #2a5c14; }
+  .result-great .result-msg { color: #085041; }
+
+  /* BREAKDOWN */
+  .breakdown {
+    background: rgba(0,0,0,0.03);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    margin-top: 1rem;
+    display: none;
+  }
+  .breakdown.visible { display: block; }
+
+  .br-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .br-row:last-child {
+    border-bottom: none;
+    font-weight: 500;
+    margin-top: 4px;
+    padding-top: 8px;
+  }
+  .br-label { color: #888; }
+  .br-val { color: #333; }
+  .br-val.neg { color: #c0392b; }
+  .br-val.result-pos { color: #0f6e56; }
+  .br-val.result-neg { color: #c0392b; }
+
+  /* CTA */
+  .cta-box {
+    background: var(--bordeaux);
+    border-radius: var(--radius);
+    padding: 1.75rem 1.5rem;
+    text-align: center;
+    display: none;
+    margin-bottom: 1rem;
+  }
+  .cta-box.visible { display: block; }
+
+  .cta-text {
+    font-size: 14px;
+    color: var(--ivory);
+    opacity: 0.8;
+    line-height: 1.6;
+    margin-bottom: 1.25rem;
+    font-weight: 300;
+  }
+
+  .cta-btn {
+    display: inline-block;
+    background: var(--gold);
+    color: var(--black);
+    font-size: 13px;
+    font-weight: 500;
+    font-family: 'DM Sans', sans-serif;
+    padding: 11px 24px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    border: none;
+    letter-spacing: 0.05em;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .cta-btn:hover { opacity: 0.85; }
+
+  .cta-gold-line {
+    height: 1px;
+    background: var(--gold);
+    opacity: 0.3;
+    margin: 1rem 0;
+  }
+
+  /* FOOTER */
+  .footer {
+    text-align: center;
+    font-size: 11px;
+    color: #aaa;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+  }
+
+  /* AMORTIZATION HELPER */
+  .amor-helper {
+    background: #faf7f2;
+    border-radius: var(--radius-sm);
+    padding: 1rem 1.25rem;
+    margin-top: 1rem;
+    border: 1px dashed rgba(201,169,110,0.4);
+  }
+  .amor-helper-title {
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+  }
+  .amor-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 0.5rem;
+    font-size: 13px;
+    color: #555;
+  }
+  .amor-row:last-child { margin-bottom: 0; }
+  .amor-row label { flex: 1; font-weight: 300; }
+  .amor-row input {
+    width: 90px;
+    text-align: right;
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    padding: 5px 8px;
+    border: 1px solid rgba(92,26,46,0.15);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--bordeaux-dark);
+    outline: none;
+    -moz-appearance: textfield;
+  }
+  .amor-row input::-webkit-inner-spin-button,
+  .amor-row input::-webkit-outer-spin-button { opacity: 1; }
+  .amor-result {
+    margin-top: 0.75rem;
+    font-size: 13px;
+    color: var(--bordeaux);
+    font-weight: 500;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(201,169,110,0.3);
+  }
+  .amor-copy-btn {
+    font-size: 11px;
+    background: var(--bordeaux);
+    color: var(--ivory);
+    border: none;
+    border-radius: 5px;
+    padding: 4px 10px;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    margin-left: 8px;
+    opacity: 0.85;
+  }
+  .amor-copy-btn:hover { opacity: 1; }
+
+  .toggle-helper {
+    font-size: 11px;
+    color: var(--gold);
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-color: rgba(201,169,110,0.4);
+    background: none;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    padding: 0;
+    margin-top: 4px;
+    display: inline-block;
+  }
+
+  @media (max-width: 480px) {
+    .header-title { font-size: 26px; }
+    .result-number { font-size: 42px; }
+    .field input[type="number"] { width: 80px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <div class="header-eyebrow">R.O.S.™ · Sara Wierzbicka</div>
+    <div class="gold-line"></div>
+    <div class="header-title">Kalkulator marży zabiegu</div>
+    <div class="header-sub">Wpisz dane jednej usługi — dowiedz się ile realnie zarabiasz</div>
+  </div>
+
+  <!-- PRZYCHÓD -->
+  <div class="section">
+    <div class="section-label">Przychód</div>
+    <div class="field">
+      <div class="field-row">
+        <div class="field-info">
+          <label for="price">Cena zabiegu netto</label>
+        </div>
+        <input type="number" id="price" placeholder="0" min="0" step="1" oninput="calc()">
+        <span class="unit">zł</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- KOSZTY -->
+  <div class="section">
+    <div class="section-label">Koszty bezpośrednie</div>
+
+    <div class="field">
+      <div class="field-row">
+        <div class="field-info">
+          <label for="mat">Materiały zużyte do zabiegu</label>
+          <span class="field-note">ampułki, jednorazówki, preparaty</span>
+        </div>
+        <input type="number" id="mat" placeholder="0" min="0" step="1" oninput="calc()">
+        <span class="unit">zł</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <div class="field-info">
+          <label for="labor">Koszt pracy</label>
+          <span class="field-note">stawka × czas lub % prowizji od netto</span>
+        </div>
+        <input type="number" id="labor" placeholder="0" min="0" step="1" oninput="calc()">
+        <span class="unit">zł</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <div class="field-info">
+          <label for="amor">Amortyzacja sprzętu</label>
+          <span class="field-note">cena ÷ 60 mies. ÷ zabiegów/mies.</span>
+        </div>
+        <input type="number" id="amor" placeholder="0" min="0" step="1" oninput="calc()">
+        <span class="unit">zł</span>
+      </div>
+      <button class="toggle-helper" onclick="toggleAmor()">Nie wiem jak to policzyć — pomóż mi ↓</button>
+      <div class="amor-helper" id="amor-helper" style="display:none;">
+        <div class="amor-helper-title">Kalkulator amortyzacji sprzętu</div>
+        <div class="amor-row">
+          <label>Cena sprzętu netto</label>
+          <input type="number" id="a-price" placeholder="0" min="0" step="1" oninput="calcAmor()">
+          <span style="font-size:12px;color:#999">zł</span>
+        </div>
+        <div class="amor-row">
+          <label>Okres amortyzacji (miesiące)</label>
+          <input type="number" id="a-months" placeholder="60" min="1" step="1" value="60" oninput="calcAmor()">
+          <span style="font-size:12px;color:#999">mies.</span>
+        </div>
+        <div class="amor-row">
+          <label>Liczba zabiegów tym sprzętem / mies.</label>
+          <input type="number" id="a-count" placeholder="0" min="1" step="1" oninput="calcAmor()">
+          <span style="font-size:12px;color:#999">szt.</span>
+        </div>
+        <div class="amor-result" id="amor-result">Uzupełnij pola powyżej</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-row">
+        <div class="field-info">
+          <label for="tax">Podatek / ZUS (szacunkowo)</label>
+          <span class="field-note">typowo 19–23% od ceny netto</span>
+        </div>
+        <input type="number" id="tax" placeholder="0" min="0" step="1" oninput="calc()">
+        <span class="unit">zł</span>
+      </div>
+      <button class="toggle-helper" onclick="autoTax()">Wylicz automatycznie 20% ↓</button>
+    </div>
+  </div>
+
+  <!-- WYNIK -->
+  <div class="result-box result-unknown" id="result-box">
+    <div class="result-eyebrow" id="result-eyebrow">Marża netto</div>
+    <div class="result-number" id="result-number">— zł</div>
+    <div class="result-percent" id="result-percent"></div>
+    <div class="result-msg" id="result-msg">Uzupełnij dane zabiegu powyżej</div>
+    <div class="breakdown" id="breakdown">
+      <div class="br-row"><span class="br-label">Cena netto</span><span class="br-val" id="br-price">—</span></div>
+      <div class="br-row"><span class="br-label">− Materiały</span><span class="br-val neg" id="br-mat">—</span></div>
+      <div class="br-row"><span class="br-label">− Praca</span><span class="br-val neg" id="br-labor">—</span></div>
+      <div class="br-row"><span class="br-label">− Amortyzacja</span><span class="br-val neg" id="br-amor">—</span></div>
+      <div class="br-row"><span class="br-label">− Podatek / ZUS</span><span class="br-val neg" id="br-tax">—</span></div>
+      <div class="br-row"><span class="br-label">= Marża netto</span><span class="br-val" id="br-total">—</span></div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box" id="cta-box">
+    <div class="cta-text">Chcesz sprawdzić marżę wszystkich zabiegów w klinice i zobaczyć, gdzie naprawdę uciekają pieniądze?</div>
+    <div class="cta-gold-line"></div>
+    <a class="cta-btn" href="https://instagram.com/sara.wierzbicka.ros" target="_blank">Napisz do mnie na Instagram →</a>
+  </div>
+
+  <div class="footer">Sara Wierzbicka · R.O.S.™ · Zewnętrzna Dyrektor Operacyjna</div>
+
+</div>
+
+<script>
+function v(id) {
+  var n = parseFloat(document.getElementById(id).value);
+  return isNaN(n) || n < 0 ? 0 : n;
+}
+function fmt(n) {
+  return Math.round(n).toLocaleString('pl-PL') + ' zł';
+}
+function fmtPct(n) {
+  return Math.round(n) + '%';
+}
+
+function toggleAmor() {
+  var el = document.getElementById('amor-helper');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function calcAmor() {
+  var ap = v('a-price');
+  var am = parseFloat(document.getElementById('a-months').value) || 60;
+  var ac = v('a-count');
+  var res = document.getElementById('amor-result');
+  if (ap === 0 || ac === 0) {
+    res.innerHTML = 'Uzupełnij pola powyżej';
+    return;
+  }
+  var result = ap / am / ac;
+  res.innerHTML = 'Amortyzacja na zabieg: <strong>' + result.toFixed(2).replace('.', ',') + ' zł</strong>' +
+    ' <button class="amor-copy-btn" onclick="copyAmor(' + result.toFixed(2) + ')">Wpisz ↑</button>';
+}
+
+function copyAmor(val) {
+  document.getElementById('amor').value = Math.round(val);
+  calc();
+  document.getElementById('amor-helper').style.display = 'none';
+}
+
+function autoTax() {
+  var price = v('price');
+  if (price === 0) { alert('Najpierw wpisz cenę zabiegu netto.'); return; }
+  document.getElementById('tax').value = Math.round(price * 0.20);
+  calc();
+}
+
+function calc() {
+  var price = v('price');
+  var mat   = v('mat');
+  var labor = v('labor');
+  var amor  = v('amor');
+  var tax   = v('tax');
+
+  var box    = document.getElementById('result-box');
+  var num    = document.getElementById('result-number');
+  var pct    = document.getElementById('result-percent');
+  var msg    = document.getElementById('result-msg');
+  var eyebrow= document.getElementById('result-eyebrow');
+  var bd     = document.getElementById('breakdown');
+  var cta    = document.getElementById('cta-box');
+
+  if (price === 0) {
+    box.className = 'result-box result-unknown';
+    num.textContent = '— zł';
+    pct.textContent = '';
+    msg.textContent = 'Uzupełnij dane zabiegu powyżej';
+    eyebrow.textContent = 'Marża netto';
+    bd.classList.remove('visible');
+    cta.classList.remove('visible');
+    return;
+  }
+
+  var marza = price - mat - labor - amor - tax;
+  var marzaPct = (marza / price) * 100;
+
+  document.getElementById('br-price').textContent = fmt(price);
+  document.getElementById('br-mat').textContent   = '− ' + fmt(mat);
+  document.getElementById('br-labor').textContent = '− ' + fmt(labor);
+  document.getElementById('br-amor').textContent  = '− ' + fmt(amor);
+  document.getElementById('br-tax').textContent   = '− ' + fmt(tax);
+
+  var totalEl = document.getElementById('br-total');
+  totalEl.textContent = fmt(marza);
+  totalEl.className = 'br-val ' + (marza >= 0 ? 'result-pos' : 'result-neg');
+
+  bd.classList.add('visible');
+
+  num.textContent = fmt(marza);
+  pct.textContent = fmtPct(marzaPct) + ' marży';
+
+  if (marza < 0) {
+    box.className = 'result-box result-negative';
+    eyebrow.textContent = 'Ten zabieg przynosi stratę';
+    msg.textContent = 'Cena nie pokrywa kosztów. Konieczna korekta cennika lub kosztów materiałowych — ten zabieg nie powinien być w ofercie bez zmian.';
+  } else if (marzaPct < 20) {
+    box.className = 'result-box result-low';
+    eyebrow.textContent = 'Marża bardzo niska';
+    msg.textContent = 'Poniżej 20% to sygnał alarmowy. Każdy no-show, rabat czy awaria sprzętu zjada cały zysk. Warto przeanalizować ceny i koszty materiałowe.';
+  } else if (marzaPct < 40) {
+    box.className = 'result-box result-ok';
+    eyebrow.textContent = 'Marża akceptowalna';
+    msg.textContent = 'Wynik między 20–40% to minimum bezpieczeństwa. Jest przestrzeń na optymalizację — sprawdź koszty materiałowe i amortyzację.';
+  } else {
+    box.className = 'result-box result-great';
+    eyebrow.textContent = 'Dobra marża';
+    msg.textContent = 'Powyżej 40% to zdrowy wynik w klinice hi-tech. Upewnij się że grafik jest wypełniony — tym zabiegiem warto zapełniać lukowe godziny.';
+  }
+
+  cta.classList.add('visible');
+}
+</script>
+</body>
+</html>
